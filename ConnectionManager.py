@@ -91,9 +91,7 @@ class Connection:
         return length
 
 
-def compose_message(content: str | bytes, content_type: Literal['PLAIN_TEXT', 'FILE', 'MSG']) -> bytes:
-    content = content.encode('UTF-8') if type(content) != bytes else content
-
+def compose_message(content: bytes, content_type: Literal['PLAIN_TEXT', 'FILE', 'MSG']) -> bytes:
     json_header: bytes = json.dumps(
         {
             'CONTENT-LENGTH': len(content),
@@ -107,20 +105,20 @@ def compose_message(content: str | bytes, content_type: Literal['PLAIN_TEXT', 'F
 
 
 class Message:
+    JSON_HEADER: dict
+    CONTENT: str | bytes
+    JSON_HEADER_LEN: int
+    MESSAGE_CONTENT_LENGTH: int
+    MESSAGE_CONTENT_TYPE: Literal['PLAIN-TEXT', 'MSG', 'FILE']
+    JSON_HEADER_TEXT: str
 
     def __init__(self):
-        self.CONTENT = None
-        self.JSON_HEADER_LEN = None
-        self.MESSAGE_CONTENT_LENGTH = None
-        self.MESSAGE_CONTENT_TYPE = None
-        self.JSON_HEADER = None
-        self.JSON_HEADER_TEXT = None
+        pass
 
     def process_protoheader(self, data: bytes):
         self.JSON_HEADER_LEN = int.from_bytes(data, "big")
 
     def process_json_header(self, data: bytes):
-
         self.JSON_HEADER_TEXT = data.decode(encoding='UTF-8')
         self.JSON_HEADER: dict = json.loads(self.JSON_HEADER_TEXT)
 
